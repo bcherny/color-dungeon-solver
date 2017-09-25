@@ -7,6 +7,22 @@
 
 ![](screenie.png)
 
+## What is this?
+
+In Zelda: Link's Awakening DX for Gameboy Color, there are several puzzle mini-games within the main game. Your character encounters one of these puzzles inside of the Color Dungeon.
+
+The game works as follows:
+
+1. There are 9 lanterns arranged in a 3x3 grid.
+2. Each lantern can be one of two colors: Red or Blue.
+3. Your character has a sword, which he can use to hit a lantern.
+4. When a lantern is hit, it will flip its color (from Red to Blue, or from Blue to Red). Additionally, any immediately neighboring lanterns will flip their colors as well. An immediate neighbor is any lantern that is exactly one row/column over horizontally/vertically (but not diagonally) from a given lantern.
+5. The goal is to find a sequence of lantern hits so that all lanterns flip to blue.
+
+The solution is not trivial to intuit. This package uses a Depth First Search strategy to find the winning sequence of lantern hits.
+
+If anyone has an improvement over this solution, or has a closed-form solution, please file an issue or PR!
+
 ## Installation
 
 ```sh
