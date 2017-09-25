@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "chalk": "^2.1.0"
+  },
+  "name": "color-dungeon-solver",
+  "version": "1.0.0",
+  "description": "A solver for the Color Dungeon Puzzle in Zelda: Link's Awakening DX for Gameboy",
+  "main": "index.js",
+  "repository": "git@github.com:bcherny/color-dungeon-solver.git",
+  "author": "Boris Cherny <boris@performancejs.com>",
+  "license": "MIT"
+}

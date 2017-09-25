@@ -1,6 +1,12 @@
+const chalk = require('chalk')
+
 const R = 'R'
 const B = 'B'
 const MAX_TRIES = 1000000
+
+module.exports.run = run
+module.exports.R = R
+module.exports.B = B
 
 /**
  * Algorithms:
@@ -12,10 +18,22 @@ function run(grid) {
 
 function path(solution) {
   let result = []
+
+  // build path
   while (solution.parent) {
     result.unshift(solution)
     solution = solution.parent
   }
+
+  // add inital state
+  result.unshift(solution)
+
+  // add children
+  // TODO: add children upstream?
+  for (let i = 0; i < result.length - 1; i++) {
+    result[i].child = result[i + 1]
+  }
+
   return result
 }
 
@@ -32,24 +50,26 @@ function solve(tree) {
       return node
     }
 
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        queue.push(new Tree(mutate(node.value, c, r), node, c, r))
-      }
-    }
+    map(node.value, (_, c, r) =>
+      queue.push(new Tree(mutate(node.value, c, r), node, c, r))
+    )
 
     n++
   }
 }
 
 function mutate(grid, x, y) {
+  return map(grid, (value, c, r) =>
+    shouldInvert(x, y, c, r) ? invert(value) : value
+  )
+}
+
+function map(grid, fn) {
   let newGrid = []
-  for (let r = 0; r < 3; r++) {
+  for (let r = 0; r < grid.length; r++) {
     newGrid[r] = []
-    for (let c = 0; c < 3; c++) {
-      newGrid[r][c] = shouldInvert(x, y, c, r)
-        ? invert(grid[r][c])
-        : grid[r][c]
+    for (let c = 0; c < grid[r].length; c++) {
+      newGrid[r][c] = fn(grid[r][c], c, r)
     }
   }
   return newGrid
@@ -88,27 +108,29 @@ class Tree {
       ${this.toStringValue(2, 0)} ${this.toStringValue(2, 1)} ${this.toStringValue(2, 2)}
 `
   }
-
   toStringValue(x, y) {
-    if (x === this.x && y === this.y) {
-      return `[${this.value[y][x]}]`
+    let value = this.value[y][x]
+    return value === R
+      ? chalk`{red R}`
+      : chalk`{blue B}`
+  }
+
+  toDiffString() {
+    return `
+    ${this.toDiffStringValue(0, 0)} ${this.toDiffStringValue(0, 1)} ${this.toDiffStringValue(0, 2)}
+    ${this.toDiffStringValue(1, 0)} ${this.toDiffStringValue(1, 1)} ${this.toDiffStringValue(1, 2)}
+    ${this.toDiffStringValue(2, 0)} ${this.toDiffStringValue(2, 1)} ${this.toDiffStringValue(2, 2)}
+    `
+  }
+  toDiffStringValue(x, y) {
+    let value = this.value[y][x]
+    if (this.child && x === this.child.x && y === this.child.y) {
+      return value === R
+        ? chalk`{bold.underline.red R}`
+        : chalk`{bold.underline.blue B}`
     }
-    return ` ${this.value[y][x]} `
+    return value === R
+      ? chalk`{red R}`
+      : chalk`{blue B}`
   }
 }
-
-// test
-
-function main() {
-  console.log('Solving...')
-  let input = [
-    [R, R, R],
-    [R, B, B],
-    [R, R, B]
-  ]
-  run(input).forEach((_, n) =>
-    console.log(`${n + 1}.`, _.toString())
-  )
-}
-
-main()
