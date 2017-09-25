@@ -34,7 +34,7 @@ run(input).forEach((step, n) =>
 )
 ```
 
-This will give the following output:
+This will give the following output (the bold block is the one to hit at each step):
 
 ![](solution.png)
 
