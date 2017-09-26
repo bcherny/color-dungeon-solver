@@ -2,7 +2,6 @@ const chalk = require('chalk')
 
 const R = 'R'
 const B = 'B'
-const MAX_TRIES = 1000000
 
 module.exports.run = run
 module.exports.R = R
@@ -41,18 +40,24 @@ function solve(tree) {
 
   let queue = [tree]
   let n = 0
+  let visted = new Set
 
-  while (queue.length && n < MAX_TRIES) {
+  while (queue.length) {
     let node = queue.shift()
+
+    visted.add(node.toString())
 
     if (isSolved(node.value)) {
       console.log(`Found solution after ${n} probes!`)
       return node
     }
 
-    map(node.value, (_, c, r) =>
-      queue.push(new Tree(mutate(node.value, c, r), node, c, r))
-    )
+    map(node.value, (_, c, r) => {
+      let tree = new Tree(mutate(node.value, c, r), node, c, r)
+      if (!visted.has(tree.toString())) {
+        queue.push(tree)
+      }
+    })
 
     n++
   }
@@ -102,11 +107,14 @@ class Tree {
   }
 
   toString() {
-    return `
-      ${this.toStringValue(0, 0)} ${this.toStringValue(0, 1)} ${this.toStringValue(0, 2)}
-      ${this.toStringValue(1, 0)} ${this.toStringValue(1, 1)} ${this.toStringValue(1, 2)}
-      ${this.toStringValue(2, 0)} ${this.toStringValue(2, 1)} ${this.toStringValue(2, 2)}
-`
+    let s = '\n'
+    for (let r = 0; r < this.value.length; r++) {
+      for (let c = 0; c < this.value[r].length; c++) {
+        s += `${this.toStringValue(r, c)} `
+      }
+      s += '\n'
+    }
+    return s
   }
   toStringValue(x, y) {
     let value = this.value[y][x]
@@ -116,11 +124,14 @@ class Tree {
   }
 
   toDiffString() {
-    return `
-    ${this.toDiffStringValue(0, 0)} ${this.toDiffStringValue(0, 1)} ${this.toDiffStringValue(0, 2)}
-    ${this.toDiffStringValue(1, 0)} ${this.toDiffStringValue(1, 1)} ${this.toDiffStringValue(1, 2)}
-    ${this.toDiffStringValue(2, 0)} ${this.toDiffStringValue(2, 1)} ${this.toDiffStringValue(2, 2)}
-    `
+    let s = '\n'
+    for (let r = 0; r < this.value.length; r++) {
+      for (let c = 0; c < this.value[r].length; c++) {
+        s += `${this.toDiffStringValue(r, c)} `
+      }
+      s += '\n'
+    }
+    return s
   }
   toDiffStringValue(x, y) {
     let value = this.value[y][x]
