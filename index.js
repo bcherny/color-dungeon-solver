@@ -36,31 +36,44 @@ function path(solution) {
   return result
 }
 
+/** Compute shortest power set via BFS */
 function solve(tree) {
 
-  let queue = [tree]
-  let n = 0
-  let visted = new Set
+  let numberOfColumns = tree.value[0].length
+  let max = numberOfColumns * tree.value.length + 1
+  let queue = [[tree, 1]]
+  let DEBUG = { n: 0 }
 
   while (queue.length) {
-    let node = queue.shift()
 
-    visted.add(node.toString())
+    let [tree, min] = queue.shift()
 
-    if (isSolved(node.value)) {
-      console.log(`Found solution after ${n} probes!`)
-      return node
+    if (isSolved(tree.value)) {
+      console.log(`Solved after ${DEBUG.n} probes!`)
+      return tree
     }
 
-    map(node.value, (_, c, r) => {
-      let tree = new Tree(mutate(node.value, c, r), node, c, r)
-      if (!visted.has(tree.toString())) {
-        queue.push(tree)
-      }
-    })
+    if (min === max) {
+      return
+    }
 
-    n++
+    for (let index = min; index < max; index++) {
+      let [x, y] = indexToCoords(index, numberOfColumns)
+      let newValue = mutate(tree.value, x, y)
+      let newTree = new Tree(newValue, tree, x, y)
+      queue.push([newTree, min + 1])
+    }
+
+    DEBUG.n++
+
   }
+}
+
+function indexToCoords(index, numberOfColumns) {
+  return [
+    Math.floor((index - 1) / numberOfColumns),
+    Math.floor((index - 1) % numberOfColumns)
+  ]
 }
 
 function mutate(grid, x, y) {
